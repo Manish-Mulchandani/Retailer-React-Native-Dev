@@ -1,15 +1,35 @@
 // CartScreen.js
 import React from 'react';
-import { View, Text, Button, FlatList, Image, StyleSheet } from 'react-native';
+import { Alert, View, Text, Button, FlatList, Image, StyleSheet } from 'react-native';
 
 const CartScreen = ({ cart, setCart }) => {
   const cartItems = Object.values(cart);
 
+  const handlePlaceOrder = () => {
+    if (Object.keys(cart).length > 0) {
+      // Display a simple notification
+      Alert.alert('Order Placed', 'Your order has been placed successfully');
+    }
+  };
   const handleRemoveFromCart = (productId) => {
     setCart((prevCart) => {
       const updatedCart = { ...prevCart };
       if (updatedCart[productId]) {
         delete updatedCart[productId]; // Remove the item from the cart
+      }
+      return updatedCart;
+    });
+  };
+
+  const handleDecrement = (productId) => {
+    setCart((prevCart) => {
+      const updatedCart = { ...prevCart };
+      if (updatedCart[productId]) {
+        if (updatedCart[productId].quantity > 1) {
+          updatedCart[productId].quantity -= 1;
+        } else {
+          delete updatedCart[productId];
+        }
       }
       return updatedCart;
     });
@@ -39,12 +59,12 @@ const CartScreen = ({ cart, setCart }) => {
             />
             <View style={styles.itemDetails}>
               <Text style={styles.productTitle}>{item.title}</Text>
-              <Text style={styles.productPrice}>Price: ${item.price.toFixed(2)}</Text>
+              <Text style={styles.productPrice}>Price: Rs.{item.price.toFixed(2)}</Text>
               <View style={styles.quantityAndRemoveContainer}>
                 <View style={styles.quantityContainer}>
                   <Button
                     title="-"
-                    onPress={() => handleRemoveFromCart(item.id)}
+                    onPress={() => handleDecrement(item.id)}
                     style={styles.quantityButton}
                   />
                   <Text style={styles.quantityText}>{item.quantity}</Text>
@@ -64,8 +84,8 @@ const CartScreen = ({ cart, setCart }) => {
           </View>
         )}
       />
-      <Text style={styles.total}>Total: ${calculateTotal(cartItems)}</Text>
-      <Button title="Place Order" /*onPress={() => /* Implement place order logic }*/ style={styles.placeOrderButton} />
+      <Text style={styles.total}>Total: Rs.{calculateTotal(cartItems)}</Text>
+      <Button title="Place Order" onPress={handlePlaceOrder} />
     </View>
   );
 };

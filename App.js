@@ -2,7 +2,7 @@ import * as React from 'react';
 import { Text, View } from 'react-native';
 import { NavigationContainer } from '@react-navigation/native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
-import ProductScreen from './screens/ProductScreen';
+import ProductScreen from './screens/ProductScreen2';
 import CartScreen from './screens/CartScreen';
 
 // function HomeScreen() {
