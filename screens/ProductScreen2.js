@@ -102,7 +102,7 @@ const ProductScreen = ({cart, setCart}) => {
               source={{uri: item.image}} // Use the product's image URL from the API
               style={styles.productImage}
             /> */}
-            <TouchableOpacity onPress={() => openImageModal(item.image)}>
+            <TouchableOpacity onPress={() => openImageModal(item.Image)}>
               <Image
                 source={{ uri: item.Image }}
                 style={styles.productImage}
