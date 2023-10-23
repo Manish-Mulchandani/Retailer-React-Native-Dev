@@ -12,7 +12,19 @@ import {
   Modal,
 } from 'react-native';
 import {fetchProducts} from '../api';
-import ImageZoom from 'react-native-image-pan-zoom';
+import { Client, Databases } from 'appwrite';
+
+const DATABASE_ID = '6532eaf0a394c74aeb32'
+const COLLECTION_ID = '6532eafc7e2ef6e5f9fb'
+const PROJECT_ID = '652fa3f6300f32d17993'
+
+const client = new Client();
+
+const databases = new Databases(client);
+
+client
+  .setEndpoint('https://cloud.appwrite.io/v1') // Your API Endpoint
+  .setProject(PROJECT_ID); // Your project ID
 
 const ProductScreen = ({cart, setCart}) => {
   const [products, setProducts] = useState([]);
@@ -23,18 +35,27 @@ const ProductScreen = ({cart, setCart}) => {
 
 
   useEffect(() => {
-    fetchProducts()
-      .then(response => setProducts(response.data))
-      .catch(error => console.error('Error fetching products:', error));
-  }, []);
+    // Make a request to fetch the products
+    const promise = databases.listDocuments(DATABASE_ID, COLLECTION_ID);
+
+    promise
+      .then(function (response) {
+        if (response && response.documents) {
+          setProducts(response.documents);
+        }
+      })
+      .catch(function (error) {
+        console.log(error); // Handle the error appropriately
+      });
+  }, []); // Empty dependency array to run the effect only once
 
   const handleIncrement = product => {
     setCart(prevCart => {
       const updatedCart = {...prevCart};
-      if (updatedCart[product.id]) {
-        updatedCart[product.id].quantity += 1;
+      if (updatedCart[product.$id]) {
+        updatedCart[product.$id].quantity += 1;
       } else {
-        updatedCart[product.id] = {...product, quantity: 1};
+        updatedCart[product.$id] = {...product, quantity: 1};
       }
       return updatedCart;
     });
@@ -43,10 +64,10 @@ const ProductScreen = ({cart, setCart}) => {
   const handleDecrement = product => {
     setCart(prevCart => {
       const updatedCart = {...prevCart};
-      if (updatedCart[product.id] && updatedCart[product.id].quantity > 1) {
-        updatedCart[product.id].quantity -= 1;
+      if (updatedCart[product.$id] && updatedCart[product.$id].quantity > 1) {
+        updatedCart[product.$id].quantity -= 1;
       } else {
-        delete updatedCart[product.id];
+        delete updatedCart[product.$id];
       }
       return updatedCart;
     });
@@ -61,7 +82,7 @@ const ProductScreen = ({cart, setCart}) => {
   };
 
   const filteredProducts = products.filter(product =>
-    product.title.toLowerCase().includes(searchText.toLowerCase()),
+    product.Name.toLowerCase().includes(searchText.toLowerCase()),
   );
 
   return (
@@ -73,7 +94,7 @@ const ProductScreen = ({cart, setCart}) => {
       />
       <FlatList
         data={filteredProducts}
-        keyExtractor={item => item.id.toString()}
+        keyExtractor={item => item.$id}
         renderItem={({item}) => (
             <View>
           <View style={styles.cartItem}>
@@ -83,14 +104,14 @@ const ProductScreen = ({cart, setCart}) => {
             /> */}
             <TouchableOpacity onPress={() => openImageModal(item.image)}>
               <Image
-                source={{ uri: item.image }}
+                source={{ uri: item.Image }}
                 style={styles.productImage}
               />
             </TouchableOpacity>
             <View style={styles.itemDetails}>
-              <Text style={styles.productTitle}>{item.title}</Text>
+              <Text style={styles.productTitle}>{item.Name}</Text>
               <Text style={styles.productPrice}>
-                Price: Rs.{item.price.toFixed(2)}
+                Price: Rs.{item.Price.toFixed(2)}
               </Text>
             </View>
             </View>
@@ -101,7 +122,7 @@ const ProductScreen = ({cart, setCart}) => {
                 </View>
               </TouchableOpacity>
               <Text style={styles.quantityText}>
-                {cart[item.id] ? cart[item.id].quantity : 0}
+                {cart[item.$id] ? cart[item.$id].quantity : 0}
               </Text>
               <TouchableOpacity onPress={() => handleIncrement(item)}>
                 <View style={styles.roundButton}>

@@ -1,6 +1,21 @@
 // CartScreen.js
 import React from 'react';
 import { Alert, View, Text, Button, FlatList, Image, StyleSheet } from 'react-native';
+import { Client, Databases } from 'appwrite';
+import 'react-native-get-random-values';
+import {v4 as uuidv4} from "uuid"
+
+const DATABASE_ID = '6532eaf0a394c74aeb32'
+const COLLECTION_ID = '6533aad5270260d0d839'
+const PROJECT_ID = '652fa3f6300f32d17993'
+
+const client = new Client()
+  .setEndpoint('https://cloud.appwrite.io/v1') // Your API Endpoint
+  .setProject(PROJECT_ID); // Your project ID
+
+  const databases = new Databases(client);
+
+//const ordersCollectionId = '6533aad5270260d0d839';
 
 const CartScreen = ({ cart, setCart }) => {
   const cartItems = Object.values(cart);
@@ -8,6 +23,40 @@ const CartScreen = ({ cart, setCart }) => {
   const handlePlaceOrder = () => {
     if (Object.keys(cart).length > 0) {
       // Display a simple notification
+      const ordersData = cart
+
+      
+      
+      let orderid = uuidv4()
+      const addOrdersToAppwrite = () => {
+        for (const orderID in ordersData) {
+          const order = ordersData[orderID];
+          console.log("first" + order)
+          // Add each order to the orders collection
+          const promise = databases.createDocument(
+            DATABASE_ID,COLLECTION_ID,uuidv4(), {
+              Order_id: orderid,
+              Quantity: order.quantity,
+              Name: order.Name,
+              Image: order.Image,
+              Price: order.Price
+            }
+          );
+          console.log("second")
+      
+          promise.then(
+            function (response) {
+              console.log(response); // Success
+            },
+            function (error) {
+              console.log(error); // Failure
+            },
+          );
+      
+        }
+      };
+      addOrdersToAppwrite()
+      //console.log(cart)
       Alert.alert('Order Placed', 'Your order has been placed successfully');
     }
   };
@@ -50,33 +99,33 @@ const CartScreen = ({ cart, setCart }) => {
       <Text style={styles.cartTitle}>Cart Items</Text>
       <FlatList
         data={cartItems}
-        keyExtractor={(item) => item.id.toString()}
+        keyExtractor={(item) => item.$id}
         renderItem={({ item }) => (
           <View style={styles.cartItem}>
-            <Image
-              source={{ uri: item.image }} // Use the product's image URL from the API
+            {Image && <Image
+              source={{ uri: item.Image }} // Use the product's image URL from the API
               style={styles.productImage}
-            />
+            />}
             <View style={styles.itemDetails}>
-              <Text style={styles.productTitle}>{item.title}</Text>
-              <Text style={styles.productPrice}>Price: Rs.{item.price.toFixed(2)}</Text>
+              <Text style={styles.productTitle}>{item.Name}</Text>
+              <Text style={styles.productPrice}>Price: Rs.{item.Price}</Text>
               <View style={styles.quantityAndRemoveContainer}>
                 <View style={styles.quantityContainer}>
                   <Button
                     title="-"
-                    onPress={() => handleDecrement(item.id)}
+                    onPress={() => handleDecrement(item.$id)}
                     style={styles.quantityButton}
                   />
                   <Text style={styles.quantityText}>{item.quantity}</Text>
                   <Button
                     title="+"
-                    onPress={() => handleIncrement(item.id)}
+                    onPress={() => handleIncrement(item.$id)}
                     style={styles.quantityButton}
                   />
                 </View>
                 <Button
                   title="Remove"
-                  onPress={() => handleRemoveFromCart(item.id)}
+                  onPress={() => handleRemoveFromCart(item.$id)}
                   style={styles.removeFromCartButton}
                 />
               </View>
@@ -91,7 +140,7 @@ const CartScreen = ({ cart, setCart }) => {
 };
 
 const calculateTotal = (cartItems) => {
-  return cartItems.reduce((total, item) => total + item.price * item.quantity, 0).toFixed(2);
+  return cartItems.reduce((total, item) => total + item.Price * item.quantity, 0).toFixed(2);
 };
 
 const styles = StyleSheet.create({
