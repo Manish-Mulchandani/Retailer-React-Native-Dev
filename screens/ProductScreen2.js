@@ -113,8 +113,8 @@ const ProductScreen = ({cart, setCart}) => {
               <Text style={styles.productPrice}>
                 Price: Rs.{item.Price.toFixed(2)}
               </Text>
-            </View>
-            </View>
+            
+            
             <View style={styles.quantityContainer}>
               <TouchableOpacity onPress={() => handleDecrement(item)}>
                 <View style={styles.roundButton}>
@@ -129,6 +129,8 @@ const ProductScreen = ({cart, setCart}) => {
                   <Text style={styles.roundButtonText}>+</Text>
                 </View>
               </TouchableOpacity>
+            </View>
+            </View>
             </View>
             
           </View>
@@ -154,55 +156,57 @@ const ProductScreen = ({cart, setCart}) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    padding: 16,
-  },
-  itemDetails: {
-    flex: 1,
-  },
-  cartItem: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginBottom: 20,
+    backgroundColor: '#F5F5F5', // Set the background color
+    paddingHorizontal: 16,
+    paddingTop: 20,
   },
   searchInput: {
     height: 40,
     borderColor: 'gray',
     borderWidth: 1,
-    marginBottom: 10,
-    padding: 8,
+    marginBottom: 20,
+    paddingHorizontal: 12,
+    borderRadius: 8, // Add rounded corners
   },
-//   productItem: {
-//     flexDirection: 'row',
-//     alignItems: 'center',
-//     marginBottom: 20,
-
-//   },
-
-  productImage: {
-    width: 70,
-    height: 70,
-    marginRight: 10,
-  },
-  productTitle: {
-    fontSize: 16,
-    fontWeight: 'bold',
-    marginTop: 8,
-  },
-  productPrice: {
-    fontSize: 14,
-    color: 'gray',
-  },
-  quantityContainer: {
-    marginTop: -10,
-    marginBottom: 15,
+  cartItem: {
     flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'center',
+    marginBottom: 20,
+    backgroundColor: 'white', // Set a white background
+    borderRadius: 12, // Add rounded corners
+    padding: 16,
+    elevation: 2, // Add a subtle shadow (for Android)
+    shadowColor: 'rgba(0, 0, 0, 0.2)', // Shadow color
+    shadowOffset: { width: 0, height: 1 }, // Shadow offset
+    shadowOpacity: 1, // Shadow opacity
+  },
+  productImage: {
+    width: 90,
+    height: 90,
+    marginRight: 16,
+    borderRadius: 8, // Make the image round
+  },
+  itemDetails: {
+    flex: 1,
+  },
+  productTitle: {
+    fontSize: 18, // Increase the font size
+    fontWeight: 'bold',
+    marginBottom: 4,
+  },
+  productPrice: {
+    fontSize: 16, // Increase the font size
+    color: '#555', // Dark gray text color
+  },
+  quantityContainer: {
+    marginTop: 8, // Slightly increase the top margin
+    flexDirection: 'row',
+    alignItems: 'center',
   },
   roundButton: {
-    width: 40,
-    height: 40,
-    borderRadius: 20, // Make the buttons round
+    width: 36,
+    height: 36,
+    borderRadius: 18, // Make the buttons round
     borderWidth: 1,
     borderColor: 'lightgray',
     justifyContent: 'center',
@@ -213,11 +217,7 @@ const styles = StyleSheet.create({
   },
   quantityText: {
     fontSize: 18,
-    marginHorizontal: 20, // Increase the margin for separation
-  },
-  zoomContainer: {
-    width: 300,
-    height: 200,
+    marginHorizontal: 20,
   },
   modalContainer: {
     flex: 1,
@@ -238,7 +238,182 @@ const styles = StyleSheet.create({
   zoomedImage: {
     width: 300,
     height: 300,
+    borderRadius: 16, // Make the zoomed image round
   },
 });
+
+// const styles = StyleSheet.create({
+//   container: {
+//     flex: 1,
+//     padding: 16,
+//     backgroundColor: 'white', // Set a background color
+//   },
+//   cartItem: {
+//     flexDirection: 'row',
+//     alignItems: 'center',
+//     marginBottom: 20,
+//     padding: 10, // Add some padding
+//     backgroundColor: 'lightgray', // Set a background color
+//     borderRadius: 8, // Add rounded corners
+//   },
+//   searchInput: {
+//     height: 40,
+//     borderColor: 'gray',
+//     borderWidth: 1,
+//     marginBottom: 10,
+//     padding: 8,
+//   },
+//   productImage: {
+//     width: 90,
+//     height: 90,
+//     marginRight: 10,
+//     borderRadius: 8, // Make the image round
+//   },
+//   itemDetails: {
+//     flex: 1,
+//   },
+//   productTitle: {
+//     fontSize: 16,
+//     fontWeight: 'bold',
+//     marginTop: 8,
+//   },
+//   productPrice: {
+//     fontSize: 14,
+//     color: 'gray',
+//   },
+//   quantityContainer: {
+//     marginTop: 5,
+//     marginBottom: 15,
+//     flexDirection: 'row',
+//     alignItems: 'center',
+//     justifyContent: 'center',
+//   },
+//   roundButton: {
+//     width: 40,
+//     height: 40,
+//     borderRadius: 20,
+//     borderWidth: 1,
+//     borderColor: 'lightgray',
+//     justifyContent: 'center',
+//     alignItems: 'center',
+//   },
+//   roundButtonText: {
+//     fontSize: 20,
+//   },
+//   quantityText: {
+//     fontSize: 18,
+//     marginHorizontal: 20,
+//   },
+//   modalContainer: {
+//     flex: 1,
+//     justifyContent: 'center',
+//     alignItems: 'center',
+//     backgroundColor: 'rgba(0, 0, 0, 0.7)',
+//   },
+//   closeButton: {
+//     position: 'absolute',
+//     top: 20,
+//     right: 20,
+//     zIndex: 1,
+//   },
+//   closeButtonText: {
+//     fontSize: 18,
+//     color: 'white',
+//   },
+//   zoomedImage: {
+//     width: 300,
+//     height: 300,
+//     borderRadius: 8, // Make the zoomed image round
+//   },
+// });
+// const styles = StyleSheet.create({
+//   container: {
+//     flex: 1,
+//     padding: 16,
+//   },
+//   itemDetails: {
+//     flex: 1,
+//   },
+//   cartItem: {
+//     flexDirection: 'row',
+//     alignItems: 'center',
+//     marginBottom: 20,
+//   },
+//   searchInput: {
+//     height: 40,
+//     borderColor: 'gray',
+//     borderWidth: 1,
+//     marginBottom: 10,
+//     padding: 8,
+//   },
+// //   productItem: {
+// //     flexDirection: 'row',
+// //     alignItems: 'center',
+// //     marginBottom: 20,
+
+// //   },
+
+//   productImage: {
+//     width: 90,
+//     height: 90,
+//     marginRight: 10,
+//   },
+//   productTitle: {
+//     fontSize: 16,
+//     fontWeight: 'bold',
+//     marginTop: 8,
+//   },
+//   productPrice: {
+//     fontSize: 14,
+//     color: 'gray',
+//   },
+//   quantityContainer: {
+//     marginTop:5,
+//     marginBottom: 15,
+//     flexDirection: 'row',
+//     alignItems: 'center',
+//     justifyContent: 'center',
+//   },
+//   roundButton: {
+//     width: 40,
+//     height: 40,
+//     borderRadius: 20, // Make the buttons round
+//     borderWidth: 1,
+//     borderColor: 'lightgray',
+//     justifyContent: 'center',
+//     alignItems: 'center',
+//   },
+//   roundButtonText: {
+//     fontSize: 20,
+//   },
+//   quantityText: {
+//     fontSize: 18,
+//     marginHorizontal: 20, // Increase the margin for separation
+//   },
+//   zoomContainer: {
+//     width: 300,
+//     height: 200,
+//   },
+//   modalContainer: {
+//     flex: 1,
+//     justifyContent: 'center',
+//     alignItems: 'center',
+//     backgroundColor: 'rgba(0, 0, 0, 0.7)',
+//   },
+//   closeButton: {
+//     position: 'absolute',
+//     top: 20,
+//     right: 20,
+//     zIndex: 1,
+//   },
+//   closeButtonText: {
+//     fontSize: 18,
+//     color: 'white',
+//   },
+//   zoomedImage: {
+//     width: 300,
+//     height: 300,
+//   },
+// });
 
 export default ProductScreen;

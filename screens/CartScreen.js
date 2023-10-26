@@ -1,9 +1,10 @@
 // CartScreen.js
-import React from 'react';
-import { Alert, View, Text, Button, FlatList, Image, StyleSheet } from 'react-native';
+import React, { useEffect, useState } from 'react';
+import { Alert, View, Text, Button, FlatList, Image, StyleSheet, Modal, TouchableOpacity } from 'react-native';
 import { Client, Databases } from 'appwrite';
 import 'react-native-get-random-values';
 import {v4 as uuidv4} from "uuid"
+import Clipboard from '@react-native-clipboard/clipboard';
 
 const DATABASE_ID = '6532eaf0a394c74aeb32'
 const COLLECTION_ID = '6533aad5270260d0d839'
@@ -15,10 +16,24 @@ const client = new Client()
 
   const databases = new Databases(client);
 
-//const ordersCollectionId = '6533aad5270260d0d839';
-
 const CartScreen = ({ cart, setCart }) => {
   const cartItems = Object.values(cart);
+  const [idToCopy, setIdToCopy] = useState('Place Order before Copying OrderId')
+  //const [isModalVisible, setModalVisible] = useState(false);
+
+  // const handleCopyId = async () => {
+  //   Clipboard.setString('Hello')
+  //   console.log(idToCopy)
+  //   const text= await Clipboard.getString();
+
+  //   setModalVisible(false); // Close the pop-up after copying
+  // };
+
+  const handleCopyId = () => {
+    Clipboard.setString(idToCopy);
+    console.log('ID copied to clipboard');
+    Alert.alert('ID Copied', 'ID Copied. Send this to the Wholesaler');
+  }
 
   const handlePlaceOrder = () => {
     if (Object.keys(cart).length > 0) {
@@ -28,6 +43,8 @@ const CartScreen = ({ cart, setCart }) => {
       
       
       let orderid = uuidv4()
+      setIdToCopy(orderid)
+      //setModalVisible(true)
       const addOrdersToAppwrite = () => {
         for (const orderID in ordersData) {
           const order = ordersData[orderID];
@@ -58,6 +75,7 @@ const CartScreen = ({ cart, setCart }) => {
       addOrdersToAppwrite()
       //console.log(cart)
       Alert.alert('Order Placed', 'Your order has been placed successfully');
+      //setModalVisible(true)
     }
   };
   const handleRemoveFromCart = (productId) => {
@@ -134,7 +152,10 @@ const CartScreen = ({ cart, setCart }) => {
         )}
       />
       <Text style={styles.total}>Total: Rs.{calculateTotal(cartItems)}</Text>
-      <Button title="Place Order" onPress={handlePlaceOrder} />
+      <View style={styles.buttonContainer}>
+      <Button style={styles.placeOrderButton} title="Place Order" onPress={handlePlaceOrder} />
+      <Button style={styles.placeOrderButton} title="Copy ID" onPress={handleCopyId} />
+      </View>
     </View>
   );
 };
@@ -147,64 +168,164 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     padding: 16,
+    backgroundColor: '#F5F5F5', // Set the background color
   },
   cartTitle: {
-    fontSize: 20,
+    fontSize: 24,
     fontWeight: 'bold',
-    marginBottom: 10,
+    marginBottom: 20,
+    color: '#333', // Dark text color
   },
   cartItem: {
     flexDirection: 'row',
     alignItems: 'center',
     marginBottom: 20,
+    backgroundColor: 'white',
+    borderRadius: 12,
+    padding: 16,
+    shadowColor: 'rgba(0, 0, 0, 0.2)',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 1,
+    elevation: 2, // Add a subtle shadow (for Android)
   },
   productImage: {
     width: 80,
     height: 80,
-    marginRight: 10,
+    marginRight: 16,
+    borderRadius: 8, // Make the image round
   },
   itemDetails: {
     flex: 1,
   },
   productTitle: {
-    fontSize: 16,
+    fontSize: 18,
     fontWeight: 'bold',
+    marginBottom: 4,
+    color: '#222', // Slightly darker text color
   },
   productPrice: {
-    fontSize: 14,
-    color: 'gray',
+    fontSize: 16,
+    color: '#555', // Dark gray text color
   },
   quantityAndRemoveContainer: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginTop: 10,
+    marginTop: 12,
   },
   quantityContainer: {
     flexDirection: 'row',
     alignItems: 'center',
   },
   quantityButton: {
-    width: 40,
-    height: 40,
-    borderRadius: 20, // Make the buttons round
+    width: 36,
+    height: 36,
+    borderRadius: 18,
+    borderWidth: 1,
+    borderColor: 'lightgray',
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   quantityText: {
-    fontSize: 16,
+    fontSize: 18,
     marginHorizontal: 10,
   },
   removeFromCartButton: {
-    backgroundColor: 'red', // Customize the color as needed
+    backgroundColor: 'red',
+    paddingVertical: 8,
+    paddingHorizontal: 16,
+    borderRadius: 8, // Make the button round
+    color: 'white', // Text color
+    fontWeight: 'bold',
   },
   total: {
-    fontSize: 18,
+    fontSize: 20,
     fontWeight: 'bold',
     marginTop: 20,
+    color: '#333',
   },
   placeOrderButton: {
-    marginTop: 10,
+    marginTop: 20,
     backgroundColor: '#007BFF',
+    paddingVertical: 12,
+    paddingHorizontal: 24,
+    borderRadius: 8, // Make the button round
+    color: 'white', // Text color
+    fontWeight: 'bold',
+    textAlign: 'center',
   },
+  buttonContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-between', // Use 'space-between' to add space between the buttons
+    marginTop: 20, // Adjust the margin as needed
+  },
+  
 });
+
+
+
+// const styles = StyleSheet.create({
+//   container: {
+//     flex: 1,
+//     padding: 16,
+//   },
+//   cartTitle: {
+//     fontSize: 20,
+//     fontWeight: 'bold',
+//     marginBottom: 10,
+//   },
+//   cartItem: {
+//     flexDirection: 'row',
+//     alignItems: 'center',
+//     marginBottom: 20,
+//   },
+//   productImage: {
+//     width: 80,
+//     height: 80,
+//     marginRight: 10,
+//   },
+//   itemDetails: {
+//     flex: 1,
+//   },
+//   productTitle: {
+//     fontSize: 16,
+//     fontWeight: 'bold',
+//   },
+//   productPrice: {
+//     fontSize: 14,
+//     color: 'gray',
+//   },
+//   quantityAndRemoveContainer: {
+//     flexDirection: 'row',
+//     justifyContent: 'space-between',
+//     alignItems: 'center',
+//     marginTop: 10,
+//   },
+//   quantityContainer: {
+//     flexDirection: 'row',
+//     alignItems: 'center',
+//   },
+//   quantityButton: {
+//     width: 40,
+//     height: 40,
+//     borderRadius: 20, // Make the buttons round
+//   },
+//   quantityText: {
+//     fontSize: 16,
+//     marginHorizontal: 10,
+//   },
+//   removeFromCartButton: {
+//     backgroundColor: 'red', // Customize the color as needed
+//   },
+//   total: {
+//     fontSize: 18,
+//     fontWeight: 'bold',
+//     marginTop: 20,
+//   },
+//   placeOrderButton: {
+//     marginTop: 10,
+//     backgroundColor: '#007BFF',
+//   },
+// });
 
 export default CartScreen;
