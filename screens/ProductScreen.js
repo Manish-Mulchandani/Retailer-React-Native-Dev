@@ -54,7 +54,7 @@ const ProductScreen = ({ cart, setCart }) => {
         renderItem={({ item }) => (
           <View style={styles.productItem}>
             <Image
-              source={{ uri: item.image }} // Use the product's image URL from the API
+              source={{ uri: `${item.image}&output=webp` }} // Use the product's image URL from the API
               style={styles.productImage}
             />
             <Text style={styles.productTitle}>{item.title}</Text>
