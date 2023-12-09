@@ -123,6 +123,7 @@ const CartScreen = ({ cart, setCart }) => {
             {Image && <Image
               source={{ uri: `${item.Image}&output=webp` }} // Use the product's image URL from the API
               style={styles.productImage}
+              resizeMode='contain'
             />}
             <View style={styles.itemDetails}>
               <Text style={styles.productTitle}>{item.Name}</Text>
