@@ -1,66 +1,74 @@
 // CartScreen.js
-import React, { useEffect, useState } from 'react';
-import { Alert, View, Text, Button, FlatList, Image, StyleSheet, Modal, TouchableOpacity } from 'react-native';
-import { Client, Databases } from 'appwrite';
+import React, {useEffect, useState} from 'react';
+import {
+  Alert,
+  View,
+  Text,
+  Button,
+  FlatList,
+  Image,
+  StyleSheet,
+  Modal,
+  TouchableOpacity,
+  TextInput,
+} from 'react-native';
+import {Client, Databases} from 'appwrite';
 import 'react-native-get-random-values';
-import {v4 as uuidv4} from "uuid"
+import {v4 as uuidv4} from 'uuid';
 import Clipboard from '@react-native-clipboard/clipboard';
 
-const DATABASE_ID = '6532eaf0a394c74aeb32'
-const COLLECTION_ID = '6533aad5270260d0d839'
-const PROJECT_ID = '652fa3f6300f32d17993'
+const DATABASE_ID = '6532eaf0a394c74aeb32';
+const COLLECTION_ID = '6533aad5270260d0d839';
+const PROJECT_ID = '652fa3f6300f32d17993';
 
 const client = new Client()
   .setEndpoint('https://cloud.appwrite.io/v1') // Your API Endpoint
   .setProject(PROJECT_ID); // Your project ID
 
-  const databases = new Databases(client);
+const databases = new Databases(client);
 
-const CartScreen = ({ cart, setCart }) => {
+const CartScreen = ({cart, setCart}) => {
   const cartItems = Object.values(cart);
-  const [idToCopy, setIdToCopy] = useState('Place Order before Copying OrderId')
-  //const [isModalVisible, setModalVisible] = useState(false);
-
-  // const handleCopyId = async () => {
-  //   Clipboard.setString('Hello')
-  //   console.log(idToCopy)
-  //   const text= await Clipboard.getString();
-
-  //   setModalVisible(false); // Close the pop-up after copying
-  // };
+  const [idToCopy, setIdToCopy] = useState(
+    'Place Order before Copying OrderId',
+  );
+  const [remarks, setRemarks] = useState({});
 
   const handleCopyId = () => {
     Clipboard.setString(idToCopy);
     console.log('ID copied to clipboard');
     Alert.alert('ID Copied', 'ID Copied. Send this to the Wholesaler');
-  }
+  };
 
   const handlePlaceOrder = () => {
     if (Object.keys(cart).length > 0) {
       // Display a simple notification
-      const ordersData = cart
+      const ordersData = cart;
 
-      
-      
-      let orderid = uuidv4()
-      setIdToCopy(orderid)
+      let orderid = uuidv4();
+      setIdToCopy(orderid);
       //setModalVisible(true)
       const addOrdersToAppwrite = () => {
         for (const orderID in ordersData) {
           const order = ordersData[orderID];
-          console.log("first" + order)
+          const remark = remarks[orderID];
+          console.log('first' + order);
           // Add each order to the orders collection
           const promise = databases.createDocument(
-            DATABASE_ID,COLLECTION_ID,uuidv4(), {
+            DATABASE_ID,
+            COLLECTION_ID,
+            uuidv4(),
+            {
               Order_id: orderid,
               Quantity: order.quantity,
               Name: order.Name,
               Image: order.Image,
-              Price: order.Price
-            }
+              Price: order.Price,
+              Remark: remark,
+            },
           );
-          console.log("second")
-      
+          console.log('second');
+
           promise.then(
             function (response) {
               console.log(response); // Success
@@ -69,18 +77,17 @@ const CartScreen = ({ cart, setCart }) => {
               console.log(error); // Failure
             },
           );
-      
         }
       };
-      addOrdersToAppwrite()
+      addOrdersToAppwrite();
       //console.log(cart)
       Alert.alert('Order Placed', 'Your order has been placed successfully');
       //setModalVisible(true)
     }
   };
-  const handleRemoveFromCart = (productId) => {
-    setCart((prevCart) => {
-      const updatedCart = { ...prevCart };
+  const handleRemoveFromCart = productId => {
+    setCart(prevCart => {
+      const updatedCart = {...prevCart};
       if (updatedCart[productId]) {
         delete updatedCart[productId]; // Remove the item from the cart
       }
@@ -88,9 +95,9 @@ const CartScreen = ({ cart, setCart }) => {
     });
   };
 
-  const handleDecrement = (productId) => {
-    setCart((prevCart) => {
-      const updatedCart = { ...prevCart };
+  const handleDecrement = productId => {
+    setCart(prevCart => {
+      const updatedCart = {...prevCart};
       if (updatedCart[productId]) {
         if (updatedCart[productId].quantity > 1) {
           updatedCart[productId].quantity -= 1;
@@ -102,9 +109,9 @@ const CartScreen = ({ cart, setCart }) => {
     });
   };
 
-  const handleIncrement = (productId) => {
-    setCart((prevCart) => {
-      const updatedCart = { ...prevCart };
+  const handleIncrement = productId => {
+    setCart(prevCart => {
+      const updatedCart = {...prevCart};
       if (updatedCart[productId]) {
         updatedCart[productId].quantity += 1;
       }
@@ -117,17 +124,29 @@ const CartScreen = ({ cart, setCart }) => {
       <Text style={styles.cartTitle}>Cart Items</Text>
       <FlatList
         data={cartItems}
-        keyExtractor={(item) => item.$id}
-        renderItem={({ item }) => (
+        keyExtractor={item => item.$id}
+        renderItem={({item}) => (
           <View style={styles.cartItem}>
-            {Image && <Image
-              source={{ uri: `${item.Image}&output=webp` }} // Use the product's image URL from the API
-              style={styles.productImage}
-              resizeMode='contain'
-            />}
+            {Image && (
+              <Image
+                source={{uri: `${item.Image}&output=webp`}} // Use the product's image URL from the API
+                style={styles.productImage}
+                resizeMode="contain"
+              />
+            )}
             <View style={styles.itemDetails}>
               <Text style={styles.productTitle}>{item.Name}</Text>
               <Text style={styles.productPrice}>Price: Rs.{item.Price}</Text>
+              <TextInput
+                placeholder="Add Remarks"
+                onChangeText={text =>
+                  setRemarks(prevRemarks => ({
+                    ...prevRemarks,
+                    [item.$id]: text,
+                  }))
+                }
+                style={styles.remarksInput}
+              />
               <View style={styles.quantityAndRemoveContainer}>
                 <View style={styles.quantityContainer}>
                   <Button
@@ -154,15 +173,25 @@ const CartScreen = ({ cart, setCart }) => {
       />
       <Text style={styles.total}>Total: Rs.{calculateTotal(cartItems)}</Text>
       <View style={styles.buttonContainer}>
-      <Button style={styles.placeOrderButton} title="Place Order" onPress={handlePlaceOrder} />
-      <Button style={styles.placeOrderButton} title="Copy ID" onPress={handleCopyId} />
+        <Button
+          style={styles.placeOrderButton}
+          title="Place Order"
+          onPress={handlePlaceOrder}
+        />
+        <Button
+          style={styles.placeOrderButton}
+          title="Copy ID"
+          onPress={handleCopyId}
+        />
       </View>
     </View>
   );
 };
 
-const calculateTotal = (cartItems) => {
-  return cartItems.reduce((total, item) => total + item.Price * item.quantity, 0).toFixed(2);
+const calculateTotal = cartItems => {
+  return cartItems
+    .reduce((total, item) => total + item.Price * item.quantity, 0)
+    .toFixed(2);
 };
 
 const styles = StyleSheet.create({
@@ -180,12 +209,12 @@ const styles = StyleSheet.create({
   cartItem: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginBottom: 20,
+    marginBottom: 8,
     backgroundColor: 'white',
-    borderRadius: 12,
-    padding: 16,
+    borderRadius: 8,
+    padding: 8,
     shadowColor: 'rgba(0, 0, 0, 0.2)',
-    shadowOffset: { width: 0, height: 2 },
+    shadowOffset: {width: 0, height: 2},
     shadowOpacity: 1,
     elevation: 2, // Add a subtle shadow (for Android)
   },
@@ -258,75 +287,15 @@ const styles = StyleSheet.create({
   buttonContainer: {
     flexDirection: 'row',
     justifyContent: 'space-between', // Use 'space-between' to add space between the buttons
-    marginTop: 20, // Adjust the margin as needed
+    marginTop: 10, // Adjust the margin as needed
   },
-  
+  remarksInput: {
+    borderWidth: 1,
+    borderColor: 'gray',
+    borderRadius: 8,
+    padding: 4,
+    marginTop: 4,
+  },
 });
-
-
-
-// const styles = StyleSheet.create({
-//   container: {
-//     flex: 1,
-//     padding: 16,
-//   },
-//   cartTitle: {
-//     fontSize: 20,
-//     fontWeight: 'bold',
-//     marginBottom: 10,
-//   },
-//   cartItem: {
-//     flexDirection: 'row',
-//     alignItems: 'center',
-//     marginBottom: 20,
-//   },
-//   productImage: {
-//     width: 80,
-//     height: 80,
-//     marginRight: 10,
-//   },
-//   itemDetails: {
-//     flex: 1,
-//   },
-//   productTitle: {
-//     fontSize: 16,
-//     fontWeight: 'bold',
-//   },
-//   productPrice: {
-//     fontSize: 14,
-//     color: 'gray',
-//   },
-//   quantityAndRemoveContainer: {
-//     flexDirection: 'row',
-//     justifyContent: 'space-between',
-//     alignItems: 'center',
-//     marginTop: 10,
-//   },
-//   quantityContainer: {
-//     flexDirection: 'row',
-//     alignItems: 'center',
-//   },
-//   quantityButton: {
-//     width: 40,
-//     height: 40,
-//     borderRadius: 20, // Make the buttons round
-//   },
-//   quantityText: {
-//     fontSize: 16,
-//     marginHorizontal: 10,
-//   },
-//   removeFromCartButton: {
-//     backgroundColor: 'red', // Customize the color as needed
-//   },
-//   total: {
-//     fontSize: 18,
-//     fontWeight: 'bold',
-//     marginTop: 20,
-//   },
-//   placeOrderButton: {
-//     marginTop: 10,
-//     backgroundColor: '#007BFF',
-//   },
-// });
 
 export default CartScreen;

@@ -1,5 +1,5 @@
 // ProductScreen.js
-import React, { useEffect, useState } from 'react';
+import React, {useEffect, useState} from 'react';
 import {
   TextInput,
   View,
@@ -11,8 +11,7 @@ import {
   TouchableOpacity,
   Modal,
 } from 'react-native';
-import { fetchProducts } from '../api';
-import { Client, Databases } from 'appwrite';
+import {Client, Databases, Query} from 'appwrite';
 
 const DATABASE_ID = '6532eaf0a394c74aeb32';
 const COLLECTION_ID = '6532eafc7e2ef6e5f9fb';
@@ -25,14 +24,16 @@ client
   .setEndpoint('https://cloud.appwrite.io/v1') // Your API Endpoint
   .setProject(PROJECT_ID); // Your project ID
 
-const ProductScreen = ({ cart, setCart }) => {
+const ProductScreen = ({cart, setCart}) => {
   const [products, setProducts] = useState([]);
   const [searchText, setSearchText] = useState('');
   const [zoomedUri, setZoomedUri] = useState(null);
 
   useEffect(() => {
     // Make a request to fetch the products
-    const promise = databases.listDocuments(DATABASE_ID, COLLECTION_ID);
+    const promise = databases.listDocuments(DATABASE_ID, COLLECTION_ID, [
+      Query.limit(1000),
+    ]);
 
     promise
       .then(function (response) {
@@ -45,22 +46,21 @@ const ProductScreen = ({ cart, setCart }) => {
       });
   }, []); // Empty dependency array to run the effect only once
 
-  const handleIncrement = (product) => {
-    
-    setCart((prevCart) => {
-      const updatedCart = { ...prevCart };
+  const handleIncrement = product => {
+    setCart(prevCart => {
+      const updatedCart = {...prevCart};
       if (updatedCart[product.$id]) {
         updatedCart[product.$id].quantity += 1;
       } else {
-        updatedCart[product.$id] = { ...product, quantity: 1 };
+        updatedCart[product.$id] = {...product, quantity: 1};
       }
       return updatedCart;
     });
   };
 
-  const handleDecrement = (product) => {
-    setCart((prevCart) => {
-      const updatedCart = { ...prevCart };
+  const handleDecrement = product => {
+    setCart(prevCart => {
+      const updatedCart = {...prevCart};
       if (updatedCart[product.$id] && updatedCart[product.$id].quantity > 1) {
         updatedCart[product.$id].quantity -= 1;
       } else {
@@ -70,7 +70,7 @@ const ProductScreen = ({ cart, setCart }) => {
     });
   };
 
-  const openImageModal = (uri) => {
+  const openImageModal = uri => {
     setZoomedUri(uri);
   };
 
@@ -78,39 +78,56 @@ const ProductScreen = ({ cart, setCart }) => {
     setZoomedUri(null);
   };
 
-  const filteredProducts = products.filter((product) =>
-    product.Name.toLowerCase().includes(searchText.toLowerCase())
+  const filteredProducts = products.filter(product =>
+    product.Name.toLowerCase().includes(searchText.toLowerCase()),
   );
 
   return (
     <View style={styles.container}>
       <TextInput
         placeholder="Search products..."
-        onChangeText={(text) => setSearchText(text)}
+        onChangeText={text => setSearchText(text)}
         style={styles.searchInput}
       />
       <FlatList
         data={filteredProducts}
-        keyExtractor={(item) => item.$id}
-        renderItem={({ item }) => (
+        keyExtractor={item => item.$id}
+        renderItem={({item}) => (
           <View style={styles.cartItem}>
-            <TouchableOpacity onPress={() => openImageModal(`${item.Image}&output=webp`)}>
-              <Image source={{ uri: `${item.Image}&output=webp` }} style={styles.productImage} resizeMode='contain' />
+            <TouchableOpacity
+              onPress={() => openImageModal(`${item.Image}&output=webp`)}>
+              <Image
+                source={{uri: `${item.Image}&output=webp`}}
+                style={styles.productImage}
+                resizeMode="contain"
+              />
             </TouchableOpacity>
             <View style={styles.itemDetails}>
               <Text style={styles.productTitle}>{item.Name}</Text>
-              <Text style={styles.productPrice}>Rs.{item.Price.toFixed(2)}</Text>
-              <Text style={[styles.productAvailability, { color: item.Available ? 'green' : 'red' }]}>
+              <Text style={styles.productPrice}>
+                Rs.{item.Price.toFixed(2)}
+              </Text>
+              <Text
+                style={[
+                  styles.productAvailability,
+                  {color: item.Available ? 'green' : 'red'},
+                ]}>
                 Available: {item.Available ? 'Yes' : 'No'}
               </Text>
               <View style={styles.quantityContainer}>
-                <TouchableOpacity onPress={() => handleDecrement(item)} disabled={!item.Available}>
+                <TouchableOpacity
+                  onPress={() => handleDecrement(item)}
+                  disabled={!item.Available}>
                   <View style={styles.roundButton}>
                     <Text style={styles.roundButtonText}>-</Text>
                   </View>
                 </TouchableOpacity>
-                <Text style={styles.quantityText}>{cart[item.$id] ? cart[item.$id].quantity : 0}</Text>
-                <TouchableOpacity onPress={() => handleIncrement(item)} disabled={!item.Available}>
+                <Text style={styles.quantityText}>
+                  {cart[item.$id] ? cart[item.$id].quantity : 0}
+                </Text>
+                <TouchableOpacity
+                  onPress={() => handleIncrement(item)}
+                  disabled={!item.Available}>
                   <View style={styles.roundButton}>
                     <Text style={styles.roundButtonText}>+</Text>
                   </View>
@@ -122,10 +139,16 @@ const ProductScreen = ({ cart, setCart }) => {
       />
       <Modal visible={zoomedUri !== null} transparent={true}>
         <View style={styles.modalContainer}>
-          <TouchableOpacity style={styles.closeButton} onPress={closeImageModal}>
+          <TouchableOpacity
+            style={styles.closeButton}
+            onPress={closeImageModal}>
             <Text style={styles.closeButtonText}>Close</Text>
           </TouchableOpacity>
-          <Image source={{ uri: zoomedUri }} style={styles.zoomedImage} resizeMode='contain' />
+          <Image
+            source={{uri: zoomedUri}}
+            style={styles.zoomedImage}
+            resizeMode="contain"
+          />
         </View>
       </Modal>
     </View>
@@ -156,7 +179,7 @@ const styles = StyleSheet.create({
     padding: 12,
     elevation: 2,
     shadowColor: 'rgba(0, 0, 0, 0.2)',
-    shadowOffset: { width: 0, height: 1 },
+    shadowOffset: {width: 0, height: 1},
     shadowOpacity: 1,
   },
   productImage: {
@@ -224,4 +247,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default ProductScreen
+export default ProductScreen;
