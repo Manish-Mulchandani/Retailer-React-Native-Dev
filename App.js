@@ -1,25 +1,54 @@
-import * as React from 'react';
-import {Text, View} from 'react-native';
+import React, {useState} from 'react';
+import {View, Text, TextInput, Button} from 'react-native';
 import {NavigationContainer} from '@react-navigation/native';
-import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
-import ProductScreen from './screens/ProductScreen';
-import CartScreen from './screens/CartScreen';
+import {Client, Account, ID} from 'appwrite';
+import PhoneAuth from './screens/PhoneAuth';
+import OTPPage from './screens/OTPPage';
+import StackNavigator from './navigation/StackNavigator';
 
-const Tab = createBottomTabNavigator();
+const App = () => {
+  const [phoneNumber, setPhoneNumber] = useState('');
 
-export default function App() {
+  const [userId, setUserId] = useState('');
+  const [message, setMessage] = useState('');
+  const [screen, setScreen] = useState('phone'); // 'phone' or 'otp'
   const [cart, setCart] = React.useState({});
+
+  const client = new Client()
+    .setEndpoint('https://cloud.appwrite.io/v1')
+    .setProject('652fa3f6300f32d17993'); // Replace with your Appwrite project ID
+
+  const account = new Account(client);
 
   return (
     <NavigationContainer>
-      <Tab.Navigator>
-        <Tab.Screen name="Products" options={{headerShown: false}}>
-          {() => <ProductScreen cart={cart} setCart={setCart} />}
-        </Tab.Screen>
-        <Tab.Screen name="Cart" options={{headerShown: false}}>
-          {() => <CartScreen cart={cart} setCart={setCart} />}
-        </Tab.Screen>
-      </Tab.Navigator>
+      {screen === 'phone' ? (
+        <PhoneAuth
+          message={message}
+          setMessage={setMessage}
+          setUserId={setUserId}
+          account={account}
+          setScreen={setScreen}
+          phoneNumber={phoneNumber}
+          setPhoneNumber={setPhoneNumber}
+        />
+      ) : screen === 'otp' ? (
+        <OTPPage
+          message={message}
+          setMessage={setMessage}
+          account={account}
+          setScreen={setScreen}
+          userId={userId}
+        />
+      ) : (
+        <StackNavigator
+          cart={cart}
+          setCart={setCart}
+          phoneNumber={phoneNumber}
+        />
+      )}
     </NavigationContainer>
   );
-}
+};
+
+export default App;

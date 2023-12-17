@@ -27,20 +27,30 @@ const client = new Client()
 
 const databases = new Databases(client);
 
-const CartScreen = ({cart, setCart}) => {
+const CartScreen = ({cart, setCart, phoneNumber}) => {
   const cartItems = Object.values(cart);
   const [idToCopy, setIdToCopy] = useState(
     'Place Order before Copying OrderId',
   );
   const [remarks, setRemarks] = useState({});
 
-  const handleCopyId = () => {
-    Clipboard.setString(idToCopy);
-    console.log('ID copied to clipboard');
-    Alert.alert('ID Copied', 'ID Copied. Send this to the Wholesaler');
-  };
-
   const handlePlaceOrder = () => {
+    if (Object.keys(cart).length > 0) {
+      // Display a confirmation alert
+      Alert.alert(
+        'Confirm Order',
+        'Are you sure you want to place this order?',
+        [
+          {
+            text: 'Cancel',
+            style: 'cancel',
+          },
+          {text: 'Place Order', onPress: () => confirmPlaceOrder()},
+        ],
+      );
+    }
+  };
+  const confirmPlaceOrder = () => {
     if (Object.keys(cart).length > 0) {
       // Display a simple notification
       const ordersData = cart;
@@ -53,6 +63,7 @@ const CartScreen = ({cart, setCart}) => {
           const order = ordersData[orderID];
           const remark = remarks[orderID];
           console.log('first' + order);
+          console.log(phoneNumber);
           // Add each order to the orders collection
           const promise = databases.createDocument(
             DATABASE_ID,
@@ -65,6 +76,7 @@ const CartScreen = ({cart, setCart}) => {
               Image: order.Image,
               Price: order.Price,
               Remark: remark,
+              Phone_Number: phoneNumber,
             },
           );
           console.log('second');
@@ -72,6 +84,7 @@ const CartScreen = ({cart, setCart}) => {
           promise.then(
             function (response) {
               console.log(response); // Success
+              console.log(phoneNumber);
             },
             function (error) {
               console.log(error); // Failure
@@ -172,18 +185,11 @@ const CartScreen = ({cart, setCart}) => {
         )}
       />
       <Text style={styles.total}>Total: Rs.{calculateTotal(cartItems)}</Text>
-      <View style={styles.buttonContainer}>
-        <Button
-          style={styles.placeOrderButton}
-          title="Place Order"
-          onPress={handlePlaceOrder}
-        />
-        <Button
-          style={styles.placeOrderButton}
-          title="Copy ID"
-          onPress={handleCopyId}
-        />
-      </View>
+      <Button
+        style={styles.placeOrderButton}
+        title="Place Order"
+        onPress={handlePlaceOrder}
+      />
     </View>
   );
 };
