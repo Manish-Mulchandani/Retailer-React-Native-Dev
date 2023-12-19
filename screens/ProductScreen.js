@@ -12,6 +12,8 @@ import {
   Modal,
 } from 'react-native';
 import {Client, Databases, Query} from 'appwrite';
+import ImageViewer from 'react-native-image-zoom-viewer';
+
 
 const DATABASE_ID = '6532eaf0a394c74aeb32';
 const COLLECTION_ID = '6532eafc7e2ef6e5f9fb';
@@ -28,6 +30,8 @@ const ProductScreen = ({cart, setCart}) => {
   const [products, setProducts] = useState([]);
   const [searchText, setSearchText] = useState('');
   const [zoomedUri, setZoomedUri] = useState(null);
+  const [fullScreenImage, setFullScreenImage] = useState(null);
+
 
   useEffect(() => {
     // Make a request to fetch the products
@@ -78,6 +82,10 @@ const ProductScreen = ({cart, setCart}) => {
     setZoomedUri(null);
   };
 
+  const openFullScreenImage = (imageUri) => {
+    setFullScreenImage([{ url: imageUri }]);
+  };
+
   const filteredProducts = products.filter(product =>
     product.Name.toLowerCase().includes(searchText.toLowerCase()),
   );
@@ -95,7 +103,7 @@ const ProductScreen = ({cart, setCart}) => {
         renderItem={({item}) => (
           <View style={styles.cartItem}>
             <TouchableOpacity
-              onPress={() => openImageModal(`${item.Image}&output=webp`)}>
+              onPress={() => openFullScreenImage(`${item.Image}&output=webp`)}>
               <Image
                 source={{uri: `${item.Image}&output=webp`}}
                 style={styles.productImage}
@@ -137,20 +145,15 @@ const ProductScreen = ({cart, setCart}) => {
           </View>
         )}
       />
-      <Modal visible={zoomedUri !== null} transparent={true}>
-        <View style={styles.modalContainer}>
-          <TouchableOpacity
-            style={styles.closeButton}
-            onPress={closeImageModal}>
-            <Text style={styles.closeButtonText}>Close</Text>
-          </TouchableOpacity>
-          <Image
-            source={{uri: zoomedUri}}
-            style={styles.zoomedImage}
-            resizeMode="contain"
+      {fullScreenImage && (
+        <Modal visible={true} transparent={true}>
+          <ImageViewer
+            imageUrls={fullScreenImage}
+            enableSwipeDown
+            onSwipeDown={() => setFullScreenImage(null)}
           />
-        </View>
-      </Modal>
+        </Modal>
+      )}
     </View>
   );
 };
