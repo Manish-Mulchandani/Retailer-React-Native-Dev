@@ -93,16 +93,18 @@ const CartScreen = ({cart, setCart, phoneNumber}) => {
             function (response) {
               console.log(response); // Success
               console.log(phoneNumber);
+              Alert.alert('Order Placed', 'Your order has been placed successfully');
             },
             function (error) {
               console.log(error); // Failure
+              Alert.alert('Order Not Placed', 'Check your internet connection and try again');
             },
           );
         }
       };
       addOrdersToAppwrite();
       //console.log(cart)
-      Alert.alert('Order Placed', 'Your order has been placed successfully');
+      
       //setModalVisible(true)
     }
     else{
@@ -329,6 +331,7 @@ const styles = StyleSheet.create({
     fontSize: 20,
     fontWeight: 'bold',
     marginTop: 20,
+    marginBottom: 2,
     color: '#333',
   },
   placeOrderButton: {
