@@ -1,6 +1,6 @@
 // components/PhoneAuth.js
 import React from 'react';
-import { View, Text, TextInput, Button, StyleSheet } from 'react-native';
+import { View, Text, TextInput, Button, StyleSheet, useColorScheme } from 'react-native';
 import { ID } from 'appwrite';
 
 const PhoneAuth = ({
@@ -22,23 +22,36 @@ const PhoneAuth = ({
       setMessage('Verification code sent.');
       setScreen('otp'); // Switch to the OTP screen
     } catch (error) {
-      setMessage('Error creating phone session');
+      setMessage('Error creating phone session. Something went wrong.');
       console.error(error);
     }
   }
 
+  const colorScheme = useColorScheme();
+  const isDarkMode = colorScheme === 'dark';
+
   return (
-    <View style={styles.container}>
-      <Text style={styles.title}>Phone Number Verification</Text>
-      <Text style={styles.message}>{message}</Text>
+    <View
+      style={[
+        styles.container,
+        { backgroundColor: isDarkMode ? '#121212' : '#fff' },
+      ]}
+    >
+      <Text style={[styles.title, { color: isDarkMode ? '#fff' : '#000' }]}>
+        Phone Number Verification
+      </Text>
+      <Text style={[styles.message, { color: isDarkMode ? '#ccc' : '#333' }]}>
+        {message}
+      </Text>
       <TextInput
-        style={styles.input}
+        style={[
+          styles.input,
+          { borderColor: isDarkMode ? '#ccc' : 'gray', color: isDarkMode ? '#fff' : '#000' },
+        ]}
         placeholder="Enter Phone Number"
         value={phoneNumber}
         keyboardType="numeric"
-        onChangeText={(text) =>
-          setPhoneNumber(text)
-        }
+        onChangeText={(text) => setPhoneNumber(text)}
       />
       <Button
         title="Send Verification Code"

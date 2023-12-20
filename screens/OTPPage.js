@@ -1,9 +1,12 @@
 // components/OTPPage.js
 import React, { useState } from 'react';
-import { View, Text, TextInput, Button, StyleSheet } from 'react-native';
+import { View, Text, TextInput, Button, StyleSheet, useColorScheme } from 'react-native';
 
 const OTPPage = ({ message, setMessage, account, setScreen, userId }) => {
   const [verificationCode, setVerificationCode] = useState('');
+
+  const colorScheme = useColorScheme();
+  const isDarkMode = colorScheme === 'dark';
 
   async function updatePhoneSession() {
     try {
@@ -11,17 +14,29 @@ const OTPPage = ({ message, setMessage, account, setScreen, userId }) => {
       setMessage('Phone session updated successfully. User is authenticated.');
       setScreen('authenticated'); // Switch to the Authenticated screen
     } catch (error) {
-      setMessage('Error updating phone session');
+      setMessage('Error updating phone session. Something went wrong.');
       console.error(error);
     }
   }
 
   return (
-    <View style={styles.container}>
-      <Text style={styles.title}>Verification Code</Text>
-      <Text style={styles.message}>{message}</Text>
+    <View
+      style={[
+        styles.container,
+        { backgroundColor: isDarkMode ? '#121212' : '#fff' },
+      ]}
+    >
+      <Text style={[styles.title, { color: isDarkMode ? '#fff' : '#000' }]}>
+        Verification Code
+      </Text>
+      <Text style={[styles.message, { color: isDarkMode ? '#ccc' : '#333' }]}>
+        {message}
+      </Text>
       <TextInput
-        style={styles.input}
+        style={[
+          styles.input,
+          { borderColor: isDarkMode ? '#ccc' : 'gray', color: isDarkMode ? '#fff' : '#000' },
+        ]}
         placeholder="Enter Verification Code"
         value={verificationCode}
         onChangeText={setVerificationCode}

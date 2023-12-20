@@ -11,6 +11,7 @@ import {
   Modal,
   TouchableOpacity,
   TextInput,
+  useColorScheme,
 } from 'react-native';
 import {Client, Databases} from 'appwrite';
 import 'react-native-get-random-values';
@@ -35,6 +36,8 @@ const CartScreen = ({cart, setCart, phoneNumber}) => {
   );
   const [remarks, setRemarks] = useState({});
   const [fullScreenImage, setFullScreenImage] = useState(null);
+  const colorScheme = useColorScheme();
+  const isDarkMode = colorScheme === 'dark';
 
   const handlePlaceOrder = () => {
     if (Object.keys(cart).length > 0) {
@@ -50,6 +53,9 @@ const CartScreen = ({cart, setCart, phoneNumber}) => {
           {text: 'Place Order', onPress: () => confirmPlaceOrder()},
         ],
       );
+    }
+    else{
+      Alert.alert('Order Not Placed', 'Please Add Items first');
     }
   };
   const confirmPlaceOrder = () => {
@@ -99,6 +105,9 @@ const CartScreen = ({cart, setCart, phoneNumber}) => {
       Alert.alert('Order Placed', 'Your order has been placed successfully');
       //setModalVisible(true)
     }
+    else{
+      Alert.alert('Order Not Placed', 'Please Add Items first');
+    }
   };
   const handleRemoveFromCart = productId => {
     setCart(prevCart => {
@@ -134,28 +143,47 @@ const CartScreen = ({cart, setCart, phoneNumber}) => {
     });
   };
 
-  const openFullScreenImage = (imageUri) => {
-    setFullScreenImage([{ url: imageUri }]);
+  const openFullScreenImage = imageUri => {
+    setFullScreenImage([{url: imageUri}]);
   };
 
   return (
-    <View style={styles.container}>
-      <Text style={styles.cartTitle}>Cart Items</Text>
+    <View
+      style={[
+        styles.container,
+        {backgroundColor: isDarkMode ? '#121212' : '#fff'},
+      ]}>
+      <Text style={[styles.cartTitle, {color: isDarkMode ? '#fff' : '#000'}]}>
+        Cart Items
+      </Text>
       <FlatList
         data={cartItems}
         keyExtractor={item => item.$id}
         renderItem={({item}) => (
-          <View style={styles.cartItem}>
-            <TouchableOpacity onPress={() => openFullScreenImage(`${item.Image}&output=webp`)}>
+          <View style={[styles.cartItem,{backgroundColor: isDarkMode ? '#121212' : '#fff'},]}>
+            <TouchableOpacity
+              onPress={() => openFullScreenImage(`${item.Image}&output=webp`)}>
               <Image
-                source={{uri: `${item.Image}&output=webp`}} // Use the product's image URL from the API
+                source={{uri: `${item.Image}&output=webp`}}
                 style={styles.productImage}
                 resizeMode="contain"
               />
             </TouchableOpacity>
             <View style={styles.itemDetails}>
-              <Text style={styles.productTitle}>{item.Name}</Text>
-              <Text style={styles.productPrice}>Price: Rs.{item.Price}</Text>
+              <Text
+                style={[
+                  styles.productTitle,
+                  {color: isDarkMode ? '#fff' : '#000'},
+                ]}>
+                {item.Name}
+              </Text>
+              <Text
+                style={[
+                  styles.productPrice,
+                  {color: isDarkMode ? '#ccc' : '#333'},
+                ]}>
+                Price: Rs.{item.Price}
+              </Text>
               <TextInput
                 placeholder="Add Remarks"
                 onChangeText={text =>
@@ -164,7 +192,13 @@ const CartScreen = ({cart, setCart, phoneNumber}) => {
                     [item.$id]: text,
                   }))
                 }
-                style={styles.remarksInput}
+                style={[
+                  styles.remarksInput,
+                  {
+                    backgroundColor: isDarkMode ? '#333' : '#f0f0f0',
+                    color: isDarkMode ? '#fff' : '#000',
+                  },
+                ]}
               />
               <View style={styles.quantityAndRemoveContainer}>
                 <View style={styles.quantityContainer}>
@@ -190,7 +224,9 @@ const CartScreen = ({cart, setCart, phoneNumber}) => {
           </View>
         )}
       />
-      <Text style={styles.total}>Total: Rs.{calculateTotal(cartItems)}</Text>
+      <Text style={[styles.total, {color: isDarkMode ? '#fff' : '#000'}]}>
+        Total: Rs.{calculateTotal(cartItems)}
+      </Text>
       <Button
         style={styles.placeOrderButton}
         title="Place Order"
