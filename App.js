@@ -12,7 +12,7 @@ const App = () => {
   const [userId, setUserId] = useState('');
   const [message, setMessage] = useState('');
   const [screen, setScreen] = useState('phone'); // 'phone' or 'otp'
-  const [cart, setCart] = React.useState({});
+  
 
   const client = new Client()
     .setEndpoint('https://cloud.appwrite.io/v1')
@@ -42,8 +42,6 @@ const App = () => {
         />
       ) : (
         <StackNavigator
-          cart={cart}
-          setCart={setCart}
           phoneNumber={phoneNumber}
         />
       )}
