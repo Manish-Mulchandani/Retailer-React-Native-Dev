@@ -37,6 +37,7 @@ const ProductScreen = ({cart, setCart}) => {
   const isDarkMode = colorScheme === 'dark';
 
 
+
   useEffect(() => {
     // Make a request to fetch the products
     const promise = databases.listDocuments(DATABASE_ID, COLLECTION_ID, [

@@ -5,6 +5,7 @@ import CartScreen from '../screens/CartScreen';
 
 import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import OrderScreen from '../screens/OrderScreen';
 
 const StackNavigator = ({phoneNumber}) => {
   const colorScheme = useColorScheme();
@@ -40,6 +41,14 @@ const StackNavigator = ({phoneNumber}) => {
     saveCartData();
   }, [cart]);
 
+  useEffect(() => {
+    const dataToStore = {
+      number: phoneNumber,
+      timestamp: new Date().getTime(),
+    }
+    AsyncStorage.setItem('phoneNumber', JSON.stringify(dataToStore))
+  },[])
+
   return (
     <Tab.Navigator>
       <Tab.Screen name="Products" options={{headerShown: false}}>
@@ -48,6 +57,11 @@ const StackNavigator = ({phoneNumber}) => {
       <Tab.Screen name="Cart" options={{headerShown: false}}>
         {() => (
           <CartScreen cart={cart} setCart={setCart} phoneNumber={phoneNumber} />
+        )}
+      </Tab.Screen>
+      <Tab.Screen name="Orders" options={{headerShown: false}}>
+        {() => (
+          <OrderScreen phoneNumber={phoneNumber} />
         )}
       </Tab.Screen>
     </Tab.Navigator>

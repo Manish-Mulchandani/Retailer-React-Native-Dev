@@ -229,6 +229,7 @@ const CartScreen = ({cart, setCart, phoneNumber}) => {
       <Text style={[styles.total, {color: isDarkMode ? '#fff' : '#000'}]}>
         Total: Rs.{calculateTotal(cartItems)}
       </Text>
+      {/* <Text>{phoneNumber}</Text> */}
       <Button
         style={styles.placeOrderButton}
         title="Place Order"
