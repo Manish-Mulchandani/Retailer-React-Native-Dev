@@ -39,6 +39,11 @@ const CartScreen = ({cart, setCart, phoneNumber}) => {
   const colorScheme = useColorScheme();
   const isDarkMode = colorScheme === 'dark';
 
+  // const currentDate = new Date();
+  // const options = {timeZone: 'Asia/Kolkata'}; // Set the time zone to IST
+  // const formattedDate = currentDate.toLocaleDateString('en-IN', options);
+  // console.log(formattedDate);
+
   const handlePlaceOrder = () => {
     if (Object.keys(cart).length > 0) {
       // Display a confirmation alert
@@ -53,15 +58,19 @@ const CartScreen = ({cart, setCart, phoneNumber}) => {
           {text: 'Place Order', onPress: () => confirmPlaceOrder()},
         ],
       );
-    }
-    else{
+    } else {
       Alert.alert('Order Not Placed', 'Please Add Items first');
     }
   };
   const confirmPlaceOrder = () => {
     if (Object.keys(cart).length > 0) {
       // Display a simple notification
+      const currentDate = new Date();
+      const options = {timeZone: 'Asia/Kolkata'}; // Set the time zone to IST
+      const formattedDate = currentDate.toLocaleDateString('en-IN', options);
+
       const ordersData = cart;
+      let flag = 1;
 
       let orderid = uuidv4();
       setIdToCopy(orderid);
@@ -85,29 +94,39 @@ const CartScreen = ({cart, setCart, phoneNumber}) => {
               Price: order.Price,
               Remark: remark,
               Phone_Number: phoneNumber,
+              Order_Date: formattedDate,
             },
           );
           console.log('second');
 
           promise.then(
             function (response) {
-              console.log(response); // Success
+              // console.log(response); // Success
               console.log(phoneNumber);
-              Alert.alert('Order Placed', 'Your order has been placed successfully');
+              // Alert.alert('Order Placed', 'Your order has been placed successfully');
             },
             function (error) {
               console.log(error); // Failure
-              Alert.alert('Order Not Placed', 'Check your internet connection and try again');
+              flag = 0;
+              // Alert.alert('Order Not Placed', 'Check your internet connection and try again');
             },
           );
         }
       };
       addOrdersToAppwrite();
       //console.log(cart)
-      
+      if (flag) {
+        Alert.alert('Order Placed', 'Your order has been placed successfully');
+        setCart({})
+      } else {
+        Alert.alert(
+          'Order Not Placed',
+          'Check your internet connection and try again',
+        );
+      }
+
       //setModalVisible(true)
-    }
-    else{
+    } else {
       Alert.alert('Order Not Placed', 'Please Add Items first');
     }
   };
@@ -162,7 +181,11 @@ const CartScreen = ({cart, setCart, phoneNumber}) => {
         data={cartItems}
         keyExtractor={item => item.$id}
         renderItem={({item}) => (
-          <View style={[styles.cartItem,{backgroundColor: isDarkMode ? '#121212' : '#fff'},]}>
+          <View
+            style={[
+              styles.cartItem,
+              {backgroundColor: isDarkMode ? '#121212' : '#fff'},
+            ]}>
             <TouchableOpacity
               onPress={() => openFullScreenImage(`${item.Image}&output=webp`)}>
               <Image

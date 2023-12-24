@@ -5,7 +5,7 @@ import CartScreen from '../screens/CartScreen';
 
 import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import OrderScreen from '../screens/OrderScreen';
+import OrdersScreen from '../screens/OrdersScreen';
 
 const StackNavigator = ({phoneNumber}) => {
   const colorScheme = useColorScheme();
@@ -61,7 +61,7 @@ const StackNavigator = ({phoneNumber}) => {
       </Tab.Screen>
       <Tab.Screen name="Orders" options={{headerShown: false}}>
         {() => (
-          <OrderScreen phoneNumber={phoneNumber} />
+          <OrdersScreen phoneNumber={phoneNumber} />
         )}
       </Tab.Screen>
     </Tab.Navigator>
